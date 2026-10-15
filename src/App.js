@@ -8,7 +8,14 @@ import { TICK_MS, createExec, tickWorld } from "./engine";
 import { initialTouching } from "./heroCollisionSwap";
 
 const SPAWN = [[-150, 0], [150, 0], [0, 110], [0, -110], [-150, 110], [150, -110]];
+
+//create a random whole number between -m and m.
 const rand = (m) => Math.round((Math.random() * 2 - 1) * m);
+
+//give a random whole number between -m and m.
+//give a random [x,y] spot for a new sprite.
+//(0,0) is the center of the stage. The stage is 480 wide and 360 tall.
+//We use 200 and 140 so the sprte stays inside the stage, a little away from the edge.
 const randomSpot = () => [rand(200), rand(140)];
 const homeOf = (s) => ({ x: s.home[0], y: s.home[1], dir: 90, say: null });
 

@@ -8,12 +8,14 @@ import { TICK_MS, createExec, tickWorld } from "./engine";
 import { initialTouching } from "./heroCollisionSwap";
 
 const SPAWN = [[-150, 0], [150, 0], [0, 110], [0, -110], [-150, 110], [150, -110]];
+const rand = (m) => Math.round((Math.random() * 2 - 1) * m);
+const randomSpot = () => [rand(200), rand(140)];
 const homeOf = (s) => ({ x: s.home[0], y: s.home[1], dir: 90, say: null });
 
 const makeSprite = (i, script = []) => ({
   id: uid(),
   name: `Sprite${i + 1}`,
-  hue: (i * 70) % 360,
+  hue: Math.floor(Math.random() * 360),
   home: SPAWN[i % SPAWN.length],
   script,
 });
@@ -91,8 +93,8 @@ export default function App() {
   }, []);
 
   const play = () => {
-    // start every run from the sprites' home positions so it can be replayed
-    commit(Object.fromEntries(sprites.map((s) => [s.id, homeOf(s)])));
+    // run from wherever the sprites currently are (Reset returns them home)
+    clearSay();
     const execs = {};
     sprites.forEach((s) => (execs[s.id] = createExec(s.script)));
     sim.current = { execs, touching: initialTouching(execs, poseRef.current) };
@@ -113,9 +115,9 @@ export default function App() {
     commit(Object.fromEntries(sprites.map((s) => [s.id, homeOf(s)])));
   };
   const addSprite = () => {
-    const s = makeSprite(counter.current++);
-    setSprites((ss) => [...ss, { ...s, home: SPAWN[ss.length % SPAWN.length] }]);
-    commit({ ...poseRef.current, [s.id]: homeOf({ ...s, home: SPAWN[sprites.length % SPAWN.length] }) });
+    const s = { ...makeSprite(counter.current++), home: randomSpot() };
+    setSprites((ss) => [...ss, s]);
+    commit({ ...poseRef.current, [s.id]: homeOf(s) });
     setActiveId(s.id);
   };
   const deleteSprite = (id) => {
